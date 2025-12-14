@@ -1,0 +1,41 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Environments
+.venv/
+.env
+.env.*
+
+# Test / coverage outputs
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Editors / OS junk
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+.python-version
+poetry.lock
+
+# Project data / temp
+app/
+data/
+tmp/
+logs/
+_dump/
+
+# JavaScript artifacts (from bundled JS client)
+node_modules/
