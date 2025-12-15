@@ -1,6 +1,6 @@
 from urllib.parse import parse_qs, urlparse
 
-from phub.routes import Route
+from app.client.phub.routes import Route
 
 
 def test_video_search_route_builds_expected_params():

@@ -1,15 +1,15 @@
 import re
 
-from .utils import slugify
+from app.core.utils import slugify
 
 
 class UrlParser:
-    video_re = re.compile(r"[\w]+\.pornhub\.com/view_video\.php\?viewkey=([a-zA-Z0-9]{1,30})")
-    album_re = re.compile(r"[\w]+\.pornhub\.com/album/([0-9]{1,30})")
-    photo_re = re.compile(r"[\w]+\.pornhub\.com/photo/([0-9]{1,30})")
-    pornstar_re = re.compile(r"[\w]+\.pornhub\.com/pornstar/([a-zA-Z0-9-]{1,30})")
-    model_re = re.compile(r"[\w]+\.pornhub\.com/model/([a-zA-Z0-9-]{1,30})")
-    channel_re = re.compile(r"[\w]+\.pornhub\.com/channels/([a-zA-Z0-9-]{1,30})")
+    video_re = re.compile(r"view_video\.php\?viewkey=([a-zA-Z0-9]+)")
+    album_re = re.compile(r"/album/([0-9]{1,30})")
+    photo_re = re.compile(r"/photo/([0-9]{1,30})")
+    pornstar_re = re.compile(r"/pornstar/([a-zA-Z0-9-]{1,30})")
+    model_re = re.compile(r"/model/([a-zA-Z0-9-]{1,30})")
+    channel_re = re.compile(r"/channels/([a-zA-Z0-9-]{1,30})")
 
     @classmethod
     def get_video_id(cls, value: str) -> str:

@@ -1,4 +1,4 @@
-from phub import utils
+from app.client.phub import utils
 
 
 def test_searchify_normalizes_spacing_and_symbols():

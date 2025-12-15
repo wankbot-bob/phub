@@ -13,17 +13,31 @@ def get_soup(html: str) -> BeautifulSoup:
     return BeautifulSoup(html, "lxml")
 
 
-def get_attr(el: Optional[Tag], name: str, default: Any = None) -> Any:
-    if el is None:
-        return default
-    return el.attrs.get(name, default)
+def _normalize_attr(value: Any, default: Any = None) -> str:
+    if value is None:
+        return str(default) if default is not None else ""
+    if isinstance(value, list):
+        return " ".join(str(v) for v in value)
+    return str(value)
 
 
-def get_data(el: Optional[Tag], name: str, default: Any = None) -> Any:
-    """Get a data-* attribute with graceful fallback."""
+def get_attr(el: Optional[Tag], name: str, default: Any = None) -> str:
+    """
+    Safe attribute getter that always returns a string (or stringified default), flattening lists if needed.
+    """
     if el is None:
-        return default
-    return el.attrs.get(f"data-{name}", el.attrs.get(name, default))
+        return str(default) if default is not None else ""
+    return _normalize_attr(el.attrs.get(name, default), default)
+
+
+def get_data(el: Optional[Tag], name: str, default: Any = None) -> str:
+    """
+    Get a data-* attribute with graceful fallback, always returning a string (or stringified default).
+    """
+    if el is None:
+        return str(default) if default is not None else ""
+    raw = el.attrs.get(f"data-{name}", el.attrs.get(name, default))
+    return _normalize_attr(raw, default)
 
 
 def text_or_empty(el: Optional[Tag]) -> str:

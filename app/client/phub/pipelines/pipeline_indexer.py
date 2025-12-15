@@ -5,10 +5,10 @@ import json
 import sys
 from urllib.parse import urljoin
 
-from phub import PornHub
-from phub.constants import BASE_URL
-from phub.parsers import parse_paging
-from phub.utils import get_attr, get_soup, text_or_empty
+from app.client.phub import PornHub
+from app.client.phub.constants import BASE_URL
+from app.client.phub.parsers import parse_paging
+from app.core.utils import get_attr, get_soup, text_or_empty
 
 
 def parse_performers(html: str) -> list[dict]:
@@ -57,9 +57,16 @@ def parse_performers(html: str) -> list[dict]:
 def index_performers(ph: PornHub, gender: str | None = None, max_pages: int | None = None) -> list[dict]:
     page = 1
     results: list[dict] = []
+    base_path = "/pornstars"
+    gender_param = gender
+    # Special case: gay listings live under /gay/pornstars without gender param
+    if gender == "male_gay":
+        base_path = "/gay/pornstars"
+        gender_param = None
+
     while True:
-        params = f"?gender={gender}" if gender else ""
-        url = f"{BASE_URL}/pornstars{params}"
+        params = f"?gender={gender_param}" if gender_param else ""
+        url = f"{BASE_URL}{base_path}{params}"
         if page > 1:
             url = f"{url}{'&' if params else '?'}page={page}"
         try:
@@ -137,12 +144,13 @@ def parse_channels(html: str) -> list[dict]:
     return channels
 
 
-def index_channels(ph: PornHub, order: str | None = None, max_pages: int | None = None) -> list[dict]:
+def index_channels(ph: PornHub, order: str | None = None, max_pages: int | None = None, *, gay: bool = False) -> list[dict]:
     page = 1
     results: list[dict] = []
+    base_path = "/gay/channels" if gay else "/channels"
     while True:
         order_param = f"?o={order}" if order else ""
-        url = f"{BASE_URL}/channels{order_param}"
+        url = f"{BASE_URL}{base_path}{order_param}"
         if page > 1:
             url = f"{url}{'&' if order_param else '?'}page={page}"
         try:
@@ -162,16 +170,20 @@ def index_channels(ph: PornHub, order: str | None = None, max_pages: int | None 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Index pornstars/models from the pornstars listing.")
-    parser.add_argument("--gender", help="Gender filter for pornstars endpoint (e.g., female, male, m2f, f2m).")
+    parser.add_argument(
+        "--gender",
+        help="Gender filter for pornstars endpoint (e.g., female, male, m2f, f2m, male_gay for /gay/pornstars).",
+    )
     parser.add_argument("--channel", action="store_true", help="Index channels instead of performers.")
+    parser.add_argument("--gay", action="store_true", help="Use gay channels listing when indexing channels.")
     parser.add_argument("--order", default="rk", help="Channel order param (default rk).")
     parser.add_argument("--max-pages", type=int, default=None, help="Limit pages to fetch.")
     args = parser.parse_args(argv)
 
     ph = PornHub()
     if args.channel:
-        channels = index_channels(ph, order=args.order, max_pages=args.max_pages)
-        payload = {"order": args.order, "channels": channels}
+        channels = index_channels(ph, order=args.order, max_pages=args.max_pages, gay=bool(args.gay))
+        payload = {"order": args.order, "gay": bool(args.gay), "channels": channels}
     else:
         performers = index_performers(ph, gender=args.gender, max_pages=args.max_pages)
         payload = {"gender": args.gender, "performers": performers}
@@ -181,5 +193,4 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
     raise SystemExit(main())

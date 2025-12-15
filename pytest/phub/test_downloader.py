@@ -1,4 +1,4 @@
-from phub.downloader import choose_media_url
+from app.client.phub.downloader import choose_media_url
 
 
 MEDIA_DEFS = [

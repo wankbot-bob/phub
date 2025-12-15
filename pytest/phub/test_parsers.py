@@ -1,12 +1,12 @@
 from bs4 import BeautifulSoup
 
-from phub.parsers import (
+from app.client.phub.parsers import (
     parse_counting,
     parse_media_definitions,
     parse_paging,
     parse_video_result,
 )
-from phub.utils import get_soup
+from app.client.phub.utils import get_soup
 
 
 def test_parse_media_definitions_extracts_entries():

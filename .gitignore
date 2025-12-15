@@ -31,7 +31,6 @@ build/
 poetry.lock
 
 # Project data / temp
-app/
 data/
 tmp/
 logs/

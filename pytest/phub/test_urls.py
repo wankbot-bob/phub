@@ -1,4 +1,4 @@
-from phub.urls import UrlParser
+from app.client.phub.urls import UrlParser
 
 
 def test_url_parser_extracts_ids_and_names():

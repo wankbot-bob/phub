@@ -5,7 +5,7 @@ description = "Python port of the PornHub.js scraping and WebMaster API client."
 authors = ["PHub Maintainers"]
 license = "MIT"
 readme = "README.md"
-packages = [{ include = "phub" }]
+packages = [{ include = "app" }]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
