@@ -25,8 +25,10 @@ def get_token(engine: Engine) -> str:
 
 def _extract_login_token(html: str) -> tuple[str, str]:
     soup = get_soup(html)
-    token = (soup.select_one('[name="token"]') or {}).get("value", "") if hasattr(soup, "select_one") else ""
-    redirect = (soup.select_one('[name="redirect"]') or {}).get("value", "") if hasattr(soup, "select_one") else ""
+    token_el = soup.select_one('[name="token"]') if hasattr(soup, "select_one") else None
+    redirect_el = soup.select_one('[name="redirect"]') if hasattr(soup, "select_one") else None
+    token = str(token_el.get("value", "") or "") if token_el else ""
+    redirect = str(redirect_el.get("value", "") or "") if redirect_el else ""
     return token, redirect
 
 

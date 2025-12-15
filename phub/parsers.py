@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import re
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 from urllib.parse import urljoin
 
 from .apis import get_auto_complete
@@ -239,10 +239,11 @@ def _parse_album_photos(soup) -> List[Dict[str, Any]]:
 
 def _parse_album_provider(soup) -> Dict[str, Any]:
     user = soup.select_one("div.pfileInfoBox div.usernameWrap")
+    link = user.select_one("a") if user else None
     return {
-        "id": get_data(user, "userid", ""),
-        "username": text_or_empty(user.select_one("a")),
-        "url": get_attr(user.select_one("a"), "href", "") or "",
+        "id": get_data(user, "userid", "") if user else "",
+        "username": text_or_empty(link),
+        "url": get_attr(link, "href", "") or "",
     }
 
 
@@ -273,10 +274,11 @@ def _parse_photo_info(soup) -> Dict[str, Any]:
 
 def _parse_photo_provider(soup) -> Dict[str, Any]:
     user = soup.select_one("div#userInformation div.usernameWrap")
+    link = user.select_one("a") if user else None
     return {
-        "id": get_data(user, "userid", 0) or 0,
-        "username": text_or_empty(user.select_one("a")),
-        "url": get_attr(user.select_one("a"), "href", "") or "",
+        "id": get_data(user, "userid", 0) or 0 if user else 0,
+        "username": text_or_empty(link),
+        "url": get_attr(link, "href", "") or "",
     }
 
 
@@ -318,9 +320,14 @@ def model_uploaded_videos(engine: Engine, url_or_name: str, page: int = 1) -> Di
 
 def _parse_profile_page(soup, is_model: bool) -> Dict[str, Any]:
     default_mapper = {"key": lambda k: k, "value": lambda v: v}
-    yes_no = lambda v: v.strip() == "Yes"
-    squeeze = lambda v: " ".join(v.split())
-    num_mapper = lambda v: parse_readable_number(v)
+    def yes_no(value: str) -> bool:
+        return value.strip() == "Yes"
+
+    def squeeze(value: str) -> str:
+        return " ".join(value.split())
+
+    def num_mapper(value: str) -> int:
+        return parse_readable_number(value)
 
     key_mapper = {
         "Relationship status": {"key": lambda _: "relationship", "value": default_mapper["value"]},
@@ -398,9 +405,10 @@ def _parse_profile_page(soup, is_model: bool) -> Dict[str, Any]:
     else:
         counter_el = soup.select_one(".pornstarVideosCounter")
         if counter_el:
-            title = text_or_empty(counter_el.parent().select_one(".sectionTitle > h2"))
-            if title.endswith("Tagged Videos"):
-                tagged_video_el = counter_el.parent()
+            parent = counter_el.parent()
+            title = text_or_empty(parent.select_one(".sectionTitle > h2")) if parent else ""
+            if title.endswith("Tagged Videos") and parent:
+                tagged_video_el = parent
                 tagged_video_count = _parse_video_count(text_or_empty(counter_el))
 
     socials = {
@@ -601,7 +609,8 @@ def channel_search(engine: Engine, keyword: str, **options: Any) -> Dict[str, An
     for item in soup.select("ul.channelGridWrapper > li > .channelsWrapper"):
         img_wrapper = item.select_one(".imgWrapper")
         description = item.select_one(".description")
-        rank_text = text_or_empty(img_wrapper.select_one(".rank"))
+        rank_el = img_wrapper.select_one(".rank") if img_wrapper else None
+        rank_text = text_or_empty(rank_el)
         try:
             rank = int(rank_text.replace("Rank", "").strip())
         except Exception:

@@ -8,7 +8,7 @@ from urllib.parse import urljoin
 from phub import PornHub
 from phub.constants import BASE_URL
 from phub.parsers import parse_paging
-from phub.utils import get_attr, get_data, get_soup, text_or_empty
+from phub.utils import get_attr, get_soup, text_or_empty
 
 
 def parse_performers(html: str) -> list[dict]:
@@ -181,4 +181,5 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
+    raise SystemExit(main())
     raise SystemExit(main())

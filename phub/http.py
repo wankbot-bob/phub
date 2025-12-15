@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 
 import requests
 from requests import Response
+from requests.adapters import HTTPAdapter
 
 from .errors import HttpStatusError, IllegalError
 from .utils import get_soup
@@ -52,7 +53,7 @@ class Request:
         Adapter example: HTTPAdapter(pool_maxsize=20)
         Proxies example: {'https': 'http://proxy:8080'}
         """
-        if isinstance(agent, requests.adapters.HTTPAdapter):
+        if isinstance(agent, HTTPAdapter):
             self.session.mount("http://", agent)
             self.session.mount("https://", agent)
         elif isinstance(agent, dict):
@@ -67,7 +68,7 @@ class Request:
         self._headers[key] = value
 
     def get_cookies(self) -> Dict[str, str]:
-        return {c.name: c.value for c in self.session.cookies}
+        return {c.name: str(c.value) for c in self.session.cookies if c.value is not None}
 
     def get_cookie(self, key: str) -> Optional[str]:
         return self.session.cookies.get(key)

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import Optional
 from urllib.parse import urlencode
 
 from .constants import BASE_URL
@@ -263,7 +264,7 @@ class Route:
                 "tattoos": yes_no(tattoos),
                 "o": PORNSTAR_LIST_ORDERING_MAP.get(order, ""),
                 "letter": letter.lower()
-                if order == "Alphabetical"
+                if order == "Alphabetical" and letter
                 else None,
                 "timeRange": PORNSTAR_POPULAR_PERIOD_MAP.get(time_range, None)
                 if order == "Most Popular" and time_range and time_range != "monthly"

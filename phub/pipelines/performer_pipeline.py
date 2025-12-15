@@ -56,7 +56,7 @@ def _fallback_videos(ph: PornHub, url: str) -> tuple[list[dict], dict | None, di
         trailer_map: dict[str, str] = {}
         for li in soup.select("li[data-video-vkey] [data-mediabook]"):
             parent_li = li.find_parent("li", attrs={"data-video-vkey": True})
-            vkey = parent_li.get("data-video-vkey") if parent_li else None
+            vkey = get_attr(parent_li, "data-video-vkey", "") if parent_li else ""
             trailer = get_attr(li, "data-mediabook", "") or get_data(li, "mediabook", "")
             if vkey and trailer:
                 trailer_map[vkey] = trailer
@@ -102,7 +102,7 @@ def _enrich_with_trailers(ph: PornHub, url: str, videos: list[dict]) -> list[dic
 
     # Prefer li items that carry the video vkey
     for li in soup.select("li[data-video-vkey]"):
-        vkey = li.get("data-video-vkey")
+        vkey = get_attr(li, "data-video-vkey", "")
         if not vkey:
             continue
         node = li.select_one("[data-mediabook]")
@@ -176,7 +176,8 @@ def fetch_gifs(ph: PornHub, gifs_url: str) -> list[dict]:
         gifs.extend(page_items)
 
         paging = parse_paging(soup)
-        if paging.get("isEnd") or (paging.get("maxPage") and page >= paging["maxPage"]):
+        max_page = paging.get("maxPage")
+        if paging.get("isEnd") or (isinstance(max_page, int) and page >= max_page):
             break
         page += 1
 
@@ -188,7 +189,7 @@ def fetch_albums(ph: PornHub, albums_url: str) -> list[dict]:
     Fetch albums with pagination support and fallback selectors.
     """
     _warmup(ph)
-    def parse_page(res_html: str) -> list[dict]:
+    def parse_page(res_html: str) -> tuple[list[dict], dict]:
         soup = get_soup(res_html)
         blocks = soup.select("ul#photosAlbumsSection li.photoAlbumListContainer div.photoAlbumListBlock")
         if not blocks:
@@ -285,7 +286,8 @@ def collect_model(ph: PornHub, url: str) -> dict:
         # attach trailers from data-mediabook
         trailer_map: dict[str, str] = {}
         for node in soup.select("li[data-video-vkey] [data-mediabook]"):
-            vkey = node.find_parent("li").get("data-video-vkey") if node.find_parent("li") else None
+            parent_li = node.find_parent("li")
+            vkey = get_attr(parent_li, "data-video-vkey", "") if parent_li else ""
             trailer = get_attr(node, "data-mediabook", "") or get_data(node, "mediabook", "")
             if vkey and trailer:
                 trailer_map[vkey] = trailer
@@ -312,7 +314,8 @@ def collect_model(ph: PornHub, url: str) -> dict:
         paging = parse_paging(soup)
         counting = {"from": 0, "to": 0, "total": len(videos)}
 
-        if paging.get("isEnd") or (paging.get("maxPage") and page >= paging["maxPage"]):
+        max_page = paging.get("maxPage")
+        if paging.get("isEnd") or (isinstance(max_page, int) and page >= max_page):
             break
         page += 1
 

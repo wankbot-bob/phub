@@ -88,7 +88,7 @@ def _parse_channel_videos(soup) -> list[dict]:
         if not link:
             continue
         url = urljoin(BASE_URL, get_attr(link, "href", ""))
-        vid = UrlParser.getVideoID(url)
+        vid = UrlParser.get_video_id(url)
         img = item.select_one("img")
         preview = (
             get_attr(img, "data-thumb_url", "")
@@ -153,7 +153,8 @@ def collect_channel_videos(ph: PornHub, url: str, max_pages: int | None = None) 
         if paging.get("isEnd"):
             break
 
-        if paging.get("maxPage") and page >= paging.get("maxPage"):
+        max_page = paging.get("maxPage")
+        if isinstance(max_page, int) and page >= max_page:
             break
 
         page += 1

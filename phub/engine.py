@@ -6,7 +6,8 @@ from .http import Dumper, Request
 
 class Engine:
     def __init__(self, dump_page: bool | str = False):
-        dumper = Dumper(dump_page) if dump_page else None
+        dumper_target = dump_page if isinstance(dump_page, str) else None
+        dumper = Dumper(dumper_target) if dump_page else None
         self.BASE_URL = BASE_URL
         self.request = Request(dumper)
         self.dumper = dumper
