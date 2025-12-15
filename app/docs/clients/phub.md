@@ -16,8 +16,8 @@ python -m app.client.phub.pipelines.performer_pipeline --pornstar {name}
 
 ### Optional detail enrichment
 
-    python -m app.client.phub.pipelines.performer_pipeline --pornstar {name} --enrich-details --workers 5 --detail-timeout 10 --detail-total-timeout 60 --verbose
-    python -m app.client.phub.pipelines.performer_pipeline --model {name} --enrich-details --workers 5 --detail-timeout 10 --detail-total-timeout 60 --verbose
+python -m app.client.phub.pipelines.performer_pipeline --pornstar {name} --max-pages 3 --enrich-details --workers 5 --detail-timeout 10 --detail-total-timeout 60 --verbose
+python -m app.client.phub.pipelines.performer_pipeline --model {name} --max-pages 3 --enrich-details --workers 5 --detail-timeout 10 --detail-total-timeout 60 --verbose
 
 ### Performer update
 
@@ -27,7 +27,7 @@ python -m app.client.phub.pipelines.update_pipeline --model {name} --verbose --m
 ## Channels
 
 python -m app.client.phub.pipelines.channel_pipeline {channel_name} --max-pages 3
-    python -m app.client.phub.pipelines.channel_pipeline {channel_name} --max-pages 3 --enrich-details --workers 5 --detail-timeout 10 --detail-total-timeout 60 --verbose
+python -m app.client.phub.pipelines.channel_pipeline {channel_name} --max-pages 3 --enrich-details --workers 5 --detail-timeout 10 --detail-total-timeout 60 --verbose
 
 ## Video
 

@@ -281,6 +281,7 @@ def collect_model(
     url: str,
     *,
     enrich_details: bool = False,
+    max_pages: int | None = None,
     max_workers: int = 5,
     detail_timeout: float = 10.0,
     detail_total_timeout: float | None = None,
@@ -333,6 +334,9 @@ def collect_model(
         if not page_items:
             verbose_print(verbose, "[performer] stopping: empty page")
             break
+        if max_pages is not None and page >= max_pages:
+            verbose_print(verbose, "[performer] stopping: reached max-pages")
+            break
         if paging.get("isEnd") or (isinstance(max_page, int) and page >= max_page):
             reason = "isEnd" if paging.get("isEnd") else "maxPage reached"
             verbose_print(verbose, f"[performer] stopping: {reason}")
@@ -377,6 +381,7 @@ def collect_pornstar(
     url: str,
     *,
     enrich_details: bool = False,
+    max_pages: int | None = None,
     max_workers: int = 5,
     detail_timeout: float = 10.0,
     detail_total_timeout: float | None = None,
@@ -421,6 +426,9 @@ def collect_pornstar(
             max_page = paging.get("maxPage")
             if not page_items:
                 verbose_print(verbose, f"[performer] stopping pornstar uploads at {page_url}: empty page")
+                break
+            if max_pages is not None and page >= max_pages:
+                verbose_print(verbose, "[performer] stopping: reached max-pages")
                 break
             if paging.get("isEnd") or (isinstance(max_page, int) and page >= max_page):
                 break
@@ -476,6 +484,7 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Fetch each video page to fill preview/views/duration/title (thread pool, slower).",
     )
+    parser.add_argument("--max-pages", type=int, default=None, help="Limit how many video pages to fetch.")
     parser.add_argument("--workers", type=int, default=5, help="Worker threads for detail enrichment.")
     parser.add_argument("--detail-timeout", type=float, default=10.0, help="Per-video detail fetch timeout in seconds.")
     parser.add_argument(
@@ -516,6 +525,7 @@ def main(argv: list[str] | None = None) -> int:
             ph,
             target_url,
             enrich_details=bool(args.enrich_details),
+            max_pages=args.max_pages,
             max_workers=args.workers,
             detail_timeout=args.detail_timeout,
             detail_total_timeout=args.detail_total_timeout,
@@ -526,6 +536,7 @@ def main(argv: list[str] | None = None) -> int:
             ph,
             target_url,
             enrich_details=bool(args.enrich_details),
+            max_pages=args.max_pages,
             max_workers=args.workers,
             detail_timeout=args.detail_timeout,
             detail_total_timeout=args.detail_total_timeout,
